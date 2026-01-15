@@ -8,8 +8,10 @@
 #include <cstddef>
 #include <algorithm>
 #include <cassert>
+#include <utility>
 #include <initializer_list>
 #include <stdexcept>
+#include <strings.h>
 
 struct ReserveProxy { size_t capacity; };
 inline ReserveProxy Reserve(const size_t capacity) { return ReserveProxy(capacity);}
@@ -59,10 +61,19 @@ public:
             capacity_ = 0;
         } else {
             items_ = new Type[other.capacity_];
-            std::move(other.begin(), other.end(), items_);
+            std::uninitialized_copy_n(other.begin(), other.size_, items_);
             size_ = other.size_;
             capacity_ = other.capacity_;
         }
+    }
+
+    SimpleVector(SimpleVector&& other) noexcept {
+        items_ = other.items_;
+        size_ = other.size_;
+        capacity_ = other.capacity_;
+        other.items_ = nullptr;
+        other.size_ = 0;
+        other.capacity_ = 0;
     }
 
     explicit SimpleVector(const ReserveProxy proxy) {
@@ -120,6 +131,8 @@ public:
     ///////////////////////////////////////////////
     // Methods
     ///////////////////////////////////////////////
+
+    // Clear vector
     void Clear() noexcept { size_ = 0; }
 
     // Reserve vector capacity
@@ -127,6 +140,7 @@ public:
         if (new_capacity > capacity_) {
             Type* new_items = new Type[new_capacity];
             std::move(items_, items_ + size_, new_items);
+            std::destroy_n(items_, size_);
             delete[] items_;
             items_ = new_items;
             capacity_ = new_capacity;
@@ -138,11 +152,15 @@ public:
         if (new_size <= size_) {
             size_ = new_size;
         } else if (new_size <= capacity_) {
-            std::fill(items_ + size_, items_ + new_size, Type());
+            for (size_t i = size_; i < new_size; ++i) {
+                new (items_ + i) Type();
+            }
             size_ = new_size;
         } else {
             Reserve(std::max(new_size, capacity_ * 2));
-            std::fill(items_ + size_, items_ + new_size, Type());
+            for (size_t i = size_; i < new_size; ++i) {
+                new (items_ + i) Type();
+            }
             size_ = new_size;
         }
     }
@@ -153,11 +171,11 @@ public:
 
     // Insert new element to the end of vector
     void PushBack(const Type& value) {
-        if (size_ == capacity_) {
-            Reserve(capacity_ == 0 ? 1 : capacity_ * 2);
-        }
-        items_[size_] = value;
-        ++size_;
+        PushBack(std::move(value));
+    }
+
+    void PushBack(Type&& value) {
+        EmplaceBack(std::move(value));
     }
 
     // Clear last element
@@ -169,35 +187,73 @@ public:
     // Remove element from vector
     Iterator Erase(ConstIterator it) {
         auto pos = const_cast<Iterator>(it);
-        std::move(pos + 1, end(), pos);
+        std::move(pos + 1, items_ + size_, pos);
+        std::destroy_at(items_ + size_ - 1);
         --size_;
         return pos;
     }
-
     // Insert new element to vector
     Iterator Insert(ConstIterator it, const Type& value) {
-        size_t index = it - begin();
+        return Insert(it, std::move(value));
+    }
+
+    Iterator Insert(ConstIterator it, Type&& value) {
+        const size_t index = it - begin();
         if (size_ == capacity_) {
             Reserve(capacity_ == 0 ? 1 : capacity_ * 2);
         }
-        std::move_backward(begin() + index, end(), end() + 1);
-        items_[index] = value;
+
+        if (index == size_) {
+            new (items_ + size_) Type(std::move(value));
+        } else {
+            new (items_ + size_) Type(std::move(items_[size_ - 1]));
+            std::move_backward(items_ + index, items_ + size_ - 1, items_ + size_);
+            items_[index] = std::move(value);
+        }
         ++size_;
         return items_ + index;
     }
 
+    template <typename... Args>
+    Type& EmplaceBack(Args&&... args) {
+        if (size_ == capacity_) {
+            Reserve(capacity_ == 0 ? 1 : capacity_ * 2);
+        }
+        new (items_ + size_) Type(std::forward<Args>(args)...);
+        ++size_;
+        return items_[size_ - 1];
+    }
+
+    // Swap vectors
     void swap(SimpleVector& other) noexcept {
         std::swap(items_, other.items_);
         std::swap(size_, other.size_);
         std::swap(capacity_, other.capacity_);
     }
 
+    // Assignment operator
     SimpleVector& operator=(const SimpleVector& rhs) {
         if (this == &rhs)
             return *this;
 
         SimpleVector temp(rhs);
         swap(temp);
+        return *this;
+    }
+
+    // Move assignment operator
+    SimpleVector& operator=(SimpleVector&& rhs) noexcept {
+        if (this == &rhs)
+            return *this;
+
+        std::destroy_n(items_, size_);
+        delete[] items_;
+        items_ = rhs.items_;
+        size_ = rhs.size_;
+        capacity_ = rhs.capacity_;
+        rhs.items_ = nullptr;
+        rhs.size_ = 0;
+        rhs.capacity_ = 0;
         return *this;
     }
 
