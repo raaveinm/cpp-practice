@@ -10,6 +10,7 @@
 #include <cassert>
 #include <utility>
 #include <initializer_list>
+#include <memory>
 #include <stdexcept>
 #include <strings.h>
 
