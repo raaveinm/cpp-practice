@@ -1,45 +1,31 @@
-//
-// Created by raaveinm on 1/20/26.
-//
-
+#include <algorithm>
+#include <cstdlib>
 #include <iostream>
-#include <string>
+#include <vector>
 
-using namespace std;
-
-struct Circle {
-    double x;
-    double y;
-    double r;
+struct Document {
+    int id = 0;
+    double relevance = 0.0;
+    int rating = 0;
 };
 
-struct Dumbbell {
-    Circle circle1;
-    Circle circle2;
-    string text;
-};
-
-struct DumbbellHash {
-    size_t operator()(const Dumbbell& dumbbell) const {
-        size_t res = 0;
-        size_t pos = 1;
-        auto add = [&](size_t v) {
-            res += v * pos;
-            pos *= 37;
-        };
-        add(hash<double>()(dumbbell.circle1.x));
-        add(hash<double>()(dumbbell.circle1.y));
-        add(hash<double>()(dumbbell.circle1.r));
-        add(hash<double>()(dumbbell.circle2.x));
-        add(hash<double>()(dumbbell.circle2.y));
-        add(hash<double>()(dumbbell.circle2.r));
-        add(hash<string>()(dumbbell.text));
-        return res;
-    }
-};
+// Сортирует документы по релевантности и рейтингу
+void SortDocuments(std::vector<Document>& docs) {
+    std::sort(docs.begin(), docs.end(),
+        [](const Document& lhs, const Document& rhs){
+            if (abs(lhs.relevance - rhs.relevance) < 1e-6) {
+                // релевантности примерно равны, упорядочиваем документы по рейтингу
+                return lhs.rating > rhs.rating;
+            } else {
+                return lhs.relevance > rhs.relevance;
+            }
+        });
+}
 
 int main() {
-    DumbbellHash hash;
-    Dumbbell dumbbell{{10, 11.5, 2.3}, {3.14, 15, -8}, "abc"s};
-    cout << "Dumbbell hash "s << hash(dumbbell);
+    std::vector<Document> docs{ {1, 0.3, 3}, {2, 0.2, 5} };
+    SortDocuments(docs);
+    for (const auto& doc : docs) {
+        std::cout << doc.id << ',';
+    }
 }

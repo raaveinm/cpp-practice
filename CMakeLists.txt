@@ -4,6 +4,9 @@ project(tmp)
 set(CMAKE_CXX_STANDARD 26)
 
 #Sprint 12
+add_executable(s12_e4 s12_e4_main.cpp)
+add_executable(s12_e3 s12_e3_main.cpp)
+add_executable(s12_e2 s12_e2_main.cpp)
 add_executable(s12_e1 s12_e1_main.cpp)
 
 #Sprint 11
