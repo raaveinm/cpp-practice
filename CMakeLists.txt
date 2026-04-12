@@ -3,6 +3,18 @@ project(tmp)
 
 set(CMAKE_CXX_STANDARD 26)
 
+#Sprint 13
+add_executable(s13_e10 s13_e10/ParseCitySubjson.cpp s13_e10/CheckDateTimeValidity.cpp s13_e10/LoadPerson.cpp)
+add_executable(s13_e9 s13_e9_main.cpp)
+add_executable(s13_e8 s13_e8_main.cpp)
+add_executable(s13_e7 s13_e7_main.cpp)
+add_executable(s13_e6 s13_e6/main.cpp s13_e6/budget_manager.h s13_e6/budget_manager.cpp s13_e6/date.h s13_e6/parser.h s13_e6/parser.cpp)
+add_executable(s13_e5 s13_e5_main.cpp)
+add_executable(s13_e4 s13_e4_main.cpp)
+add_executable(s13_e3 s13_e3_main.cpp)
+add_executable(s13_e2 s13_e2_main.cpp)
+add_executable(s13_e1 s13_e1_main.cpp)
+
 #Sprint 12
 add_executable(s12_e4 s12_e4_main.cpp)
 add_executable(s12_e3 s12_e3_main.cpp)
@@ -46,3 +58,5 @@ add_executable(SimpleVector simplevector/main.cpp simplevector/simple_vector.h s
 add_executable(task_3 task3/main.cpp task3/log_duration.h task3/my_assert.h task3/stack_vector.h)
 add_executable(task_2 task_2_main.cpp)
 add_executable(task_1 task_1_main.cpp)
+
+add_executable(sheeesh trash.cpp)
