@@ -3,6 +3,13 @@ project(tmp)
 
 set(CMAKE_CXX_STANDARD 26)
 
+#Sprint 14
+add_executable(s14_e3_3 variadic_templates/s14_e3_3_main.cpp variadic_templates/optional.h)
+add_executable(s14_e3_2_main variadic_templates/s14_e3_2_main.cpp)
+add_executable(s14_e3 variadic_templates/s14_e3_main.cpp)
+add_executable(self_harmed_vector s14_e2/main.cpp s14_e2/vector.h)
+add_executable(s14_e1 s14_e1/main.cpp s14_e1/optional.h)
+
 #Sprint 13
 add_executable(s13_e10 s13_e10/ParseCitySubjson.cpp s13_e10/CheckDateTimeValidity.cpp s13_e10/LoadPerson.cpp)
 add_executable(s13_e9 s13_e9_main.cpp)
