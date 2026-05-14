@@ -3,6 +3,34 @@ project(tmp)
 
 set(CMAKE_CXX_STANDARD 26)
 
+#CMAKE_CXX_STANDARD
+#CMAKE_BUILD_TYPE
+
+set(HELLO_WORLD Hello " " World) # HELLO_WORLD = Hello, " ", World
+message(STATUS "Value of HELLO_WORLD: " ${HELLO_WORLD})
+
+set(SOURCE_DIR "src" CACHE STRING "Path of source files")
+message(STATUS "SOURCE_DIR value: ${SOURCE_DIR}")
+
+set(SOURCE_DIR "src2" CACHE STRING "Path of source files")
+message(STATUS "SOURCE_DIR value after another set: ${SOURCE_DIR}")
+
+set(SOURCE_DIR "no_cache")
+message(STATUS "SOURCE_DIR value after another set: ${SOURCE_DIR}")
+
+if(CMAKE_SYSTEM_NAME MATCHES "^MINGW")
+    set(SYSTEM_LIBS -lstdc++)
+    message("RRR")
+else()
+    message("rrr")
+    set(SYSTEM_LIBS)
+endif()
+
+#target_link_libraries(negate ${SYSTEM_LIBS})
+
+#Sprint 15
+add_executable(s15_e1 s15_e1/main.cpp s15_e1/img_lib.cpp s15_e1/img_lib.h s15_e1/ppm_image.cpp s15_e1/ppm_image.h)
+
 #Sprint 14
 add_executable(s14_e3_3 variadic_templates/s14_e3_3_main.cpp variadic_templates/optional.h)
 add_executable(s14_e3_2_main variadic_templates/s14_e3_2_main.cpp)
